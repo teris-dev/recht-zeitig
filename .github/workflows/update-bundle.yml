@@ -24,15 +24,22 @@ jobs:
           php-version: "8.5"
           coverage: none
       - run: composer install --no-interaction --no-progress --prefer-dist
-      - run: composer update teris-dev/erecht24-bundle --no-interaction --no-progress --prefer-dist
 
+      # Nur auf einen neuen Bundle-Commit reagieren, nicht auf Formatänderungen am Lock
+      # (z. B. eine neuere Composer-Version in der CI).
       - id: diff
         run: |
-          if git diff --quiet composer.lock; then
+          ref() { jq -r '.packages[] | select(.name == "teris-dev/erecht24-bundle") | .source.reference' composer.lock; }
+          before=$(ref)
+          composer update teris-dev/erecht24-bundle --no-interaction --no-progress --prefer-dist
+          after=$(ref)
+          echo "Bundle: ${before:0:7} -> ${after:0:7}"
+          if [ "$before" = "$after" ]; then
+            git checkout -- composer.lock
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "ref=$(composer show teris-dev/erecht24-bundle --format=json | jq -r '.source.reference[0:7]')" >> "$GITHUB_OUTPUT"
+            echo "ref=${after:0:7}" >> "$GITHUB_OUTPUT"
           fi
 
       - if: steps.diff.outputs.changed == 'true'
