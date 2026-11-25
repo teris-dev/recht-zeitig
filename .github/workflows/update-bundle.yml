@@ -1,0 +1,46 @@
+# Hält recht-zeitig auf dem neuesten Stand von teris-dev/erecht24-bundle (main):
+# stündlich composer.lock aktualisieren, Smoke-Test, bei Erfolg direkt auf main pushen.
+# sym deployt den Commit beim nächsten Autodeploy (stündlich :17, Health-Check mit Rollback).
+name: Bundle aktualisieren
+
+on:
+  schedule:
+    - cron: "5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-bundle
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.5"
+          coverage: none
+      - run: composer install --no-interaction --no-progress --prefer-dist
+      - run: composer update teris-dev/erecht24-bundle --no-interaction --no-progress --prefer-dist
+
+      - id: diff
+        run: |
+          if git diff --quiet composer.lock; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "ref=$(composer show teris-dev/erecht24-bundle --format=json | jq -r '.source.reference[0:7]')" >> "$GITHUB_OUTPUT"
+          fi
+
+      - if: steps.diff.outputs.changed == 'true'
+        run: bin/smoke-test
+
+      - if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Bundle teris-dev/erecht24-bundle auf ${{ steps.diff.outputs.ref }} aktualisiert"
+          git push

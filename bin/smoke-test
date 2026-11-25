@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Startet die App lokal und prüft Seiten + Push-Endpunkt (nutzt die echte eRecht24-API mit dem Demo-Key).
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+bin/console lint:container -q
+bin/console lint:twig templates -q
+bin/console lint:yaml config -q
+
+port=8099
+php -S 127.0.0.1:$port -t public >/dev/null 2>&1 &
+server=$!
+trap 'kill $server' EXIT
+sleep 1
+
+fail=0
+expect() { # expect <status> <path> [text]
+    local body code
+    body=$(curl -s -w '\n%{http_code}' "http://127.0.0.1:$port$2" "${@:4}")
+    code=${body##*$'\n'}; body=${body%$'\n'*}
+    if [ "$code" != "$1" ] || { [ -n "${3:-}" ] && ! grep -q "$3" <<<"$body"; }; then
+        echo "FAIL $2: HTTP $code (erwartet $1${3:+, Text \"$3\"})"; fail=1
+    else
+        echo "ok   $2"
+    fi
+}
+
+expect 200 /healthz
+expect 200 / 'Stand bei eRecht24'
+expect 200 /impressum '<h1>Impressum</h1>'
+expect 200 /en/imprint '<h1>Site Notice</h1>'
+expect 200 /datenschutz 'Datenschutz'
+expect 200 /en/privacy-policy 'Privacy Policy'
+expect 404 /erecht24/push 'No push client registered' -X POST -H 'Content-Type: application/json' -d '{"erecht24_type":"ping"}'
+
+exit $fail

@@ -3313,12 +3313,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/teris-dev/erecht24-bundle.git",
-                "reference": "69a9fe4d440c90c202a8e5687d9fc00ac893b361"
+                "reference": "e6825b98d699a17d6caa92f04c4944b0cced11ae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/teris-dev/erecht24-bundle/zipball/69a9fe4d440c90c202a8e5687d9fc00ac893b361",
-                "reference": "69a9fe4d440c90c202a8e5687d9fc00ac893b361",
+                "url": "https://api.github.com/repos/teris-dev/erecht24-bundle/zipball/e6825b98d699a17d6caa92f04c4944b0cced11ae",
+                "reference": "e6825b98d699a17d6caa92f04c4944b0cced11ae",
                 "shasum": ""
             },
             "require": {
@@ -3385,7 +3385,7 @@
                 "source": "https://github.com/teris-dev/erecht24-bundle/tree/main",
                 "issues": "https://github.com/teris-dev/erecht24-bundle/issues"
             },
-            "time": "2026-11-25T10:05:11+00:00"
+            "time": "2026-11-25T10:27:27+00:00"
         },
         {
             "name": "twig/twig",

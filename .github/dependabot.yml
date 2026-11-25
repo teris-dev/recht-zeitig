@@ -1,0 +1,25 @@
+# Abhängigkeiten aktuell halten. Patch/Minor kommen gebündelt als ein PR pro Tag und werden nach
+# grünem CI automatisch gemergt (ci.yml, Job „automerge“); der Server-Autodeploy auf sym bringt
+# den Merge innerhalb einer Stunde live. Major-Updates bleiben als PR liegen.
+# Das Bundle (dev-main) aktualisiert update-bundle.yml.
+version: 2
+updates:
+  - package-ecosystem: composer
+    directory: "/"
+    schedule:
+      interval: daily
+      time: "04:00"
+      timezone: Europe/Berlin
+    ignore:
+      - dependency-name: teris-dev/erecht24-bundle
+    groups:
+      composer-minor-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]

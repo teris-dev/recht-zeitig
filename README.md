@@ -56,3 +56,14 @@ sudo site recht-zeitig console erecht24:client:test-push --type=imprint
 
 Danach im eRecht24 Projekt-Manager einen Text ändern, auf „Synchronisieren“ klicken
 und auf der Startseite den neuen Stand prüfen.
+
+## Automatische Updates
+
+- **Bundle:** `.github/workflows/update-bundle.yml` prüft stündlich, ob es einen neuen Stand von
+  `teris-dev/erecht24-bundle` (main) gibt, aktualisiert `composer.lock`, führt `bin/smoke-test`
+  aus und pusht nur bei Erfolg auf `main`.
+- **Übrige Abhängigkeiten:** Dependabot (täglich), Patch/Minor werden nach grünem CI automatisch gemergt.
+- **Deploy:** sym (`AUTODEPLOY=1`) deployt jeden neuen Commit auf `main` stündlich um :17.
+  Scheitert der Health-Check, bleibt das vorherige Release aktiv.
+
+`bin/smoke-test` startet die App lokal und prüft alle Seiten und den Push-Endpunkt.
