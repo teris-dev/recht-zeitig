@@ -1,0 +1,6 @@
+erecht24:
+    api_key: '%env(ERECHT24_API_KEY)%'
+    client_id: '%env(ERECHT24_CLIENT_ID)%'
+    client_secret: '%env(ERECHT24_CLIENT_SECRET)%'
+    client_info:
+        plugin_name: 'teris-dev/erecht24-bundle (Demo recht-zeitig)'

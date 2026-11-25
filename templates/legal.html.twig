@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% set doc = erecht24_legal_document(type) %}
+
+{% block title %}{{ type == 'imprint' ? (app.request.locale == 'de' ? 'Impressum' : 'Imprint') : (app.request.locale == 'de' ? 'Datenschutzerklärung' : 'Privacy Policy') }}{% endblock %}
+
+{% block body %}
+    <article class="legal">
+        {% if doc %}
+            {{ doc.html(app.request.locale)|raw }}
+            <p class="meta">
+                {{ app.request.locale == 'de' ? 'Stand' : 'Last updated' }}:
+                {{ doc.modifiedAt ? doc.modifiedAt|date('d.m.Y', 'Europe/Berlin') : '–' }} · eRecht24
+            </p>
+        {% else %}
+            <h1>{{ block('title') }}</h1>
+            <p>{{ app.request.locale == 'de' ? 'Der Text ist vorübergehend nicht verfügbar.' : 'This text is temporarily unavailable.' }}</p>
+        {% endif %}
+    </article>
+{% endblock %}

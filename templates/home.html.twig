@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Rechtstexte, die von selbst aktuell bleiben{% endblock %}
+
+{% block body %}
+    <h1>Rechtstexte, die von selbst aktuell bleiben.</h1>
+    <p>
+        <strong>recht-zeitig</strong> ist die Demo-Anwendung des Open-Source-Bundles
+        <a href="https://github.com/teris-dev/erecht24-bundle"><code>teris-dev/erecht24-bundle</code></a>
+        für Symfony. Impressum und Datenschutzerklärung dieser Seite kommen direkt aus dem
+        eRecht24 Projekt-Manager: Wird dort ein Text geändert und synchronisiert, schickt
+        eRecht24 einen Push, das Bundle holt die neue Fassung ab und die Seite zeigt sie sofort an.
+    </p>
+
+    <div class="card">
+        <dl>
+            {% for type, label in {imprint: 'Impressum', privacyPolicy: 'Datenschutzerklärung'} %}
+                {% set doc = erecht24_legal_document(type) %}
+                <dt>{{ label }}</dt>
+                <dd>
+                    {% if doc %}
+                        Stand bei eRecht24 {{ doc.modifiedAt ? doc.modifiedAt|date('d.m.Y H:i', 'Europe/Berlin') : 'unbekannt' }},
+                        abgeholt {{ doc.fetchedAt|date('d.m.Y H:i', 'Europe/Berlin') }}
+                    {% else %}
+                        derzeit nicht verfügbar
+                    {% endif %}
+                </dd>
+            {% endfor %}
+            <dt>Push-Endpunkt</dt>
+            <dd><code>{{ push_uri }}</code></dd>
+        </dl>
+    </div>
+
+    <p class="meta">
+        Diese Seite läuft im Single-Modus: ein eRecht24-Projekt, API-Key in der Umgebung.
+        Dasselbe Bundle betreibt im Multi-Tenant-Modus beliebig viele Webseiten aus einer Anwendung.
+    </p>
+{% endblock %}

@@ -1,0 +1,3 @@
+erecht24:
+    resource: '@ERecht24Bundle/config/routes.php'
+    prefix: /erecht24
